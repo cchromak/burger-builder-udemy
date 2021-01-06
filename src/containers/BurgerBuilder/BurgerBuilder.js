@@ -19,6 +19,7 @@ class BurgerBuilder extends Component {
         return(
             <Auxiliary>
                 <Burger ingredients={this.state.ingredients}/>
+                
                 <div>build controls</div>
             </Auxiliary>
         );
