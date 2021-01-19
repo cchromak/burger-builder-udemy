@@ -93,6 +93,19 @@ class ContactData extends Component {
    
     }
 
+    inputChangedHandler = (event, inputIdentifer) => {
+        // Implemented two way binding. updates value in state for orderform.
+        const updatedOrderForm = {
+            ...this.state.orderForm
+        };
+        const updatedFormElement = {
+            ...updatedOrderForm[inputIdentifer]
+        };
+        updatedFormElement.value = event.target.value;
+        updatedOrderForm[inputIdentifer] = updatedFormElement;
+        this.setState({orderForm: updatedOrderForm});
+    }
+
     render() {
         // Create array of js objects orderform
         const formElementsArray = [];
@@ -109,11 +122,9 @@ class ContactData extends Component {
                         key={formElement.id}
                         elementType={formElement.config.elementType}
                         elementConfig={formElement.config.elementConfig}
-                        value={formElement.config.value} />
+                        value={formElement.config.value}
+                        changed={(event) => this.inputChangedHandler(event, formElement.id)} />
                 ))}
-                {/* <Input inputtype="input"  name="email" placeholder="Your eamil" />                  
-                <Input inputtype="input" name="street" placeholder="Street" />
-                <Input inputtype="input" name="postal" placeholder="Postal Code" /> */}
                 <Button btnType="Success" clicked={this.orderHandler}>ORDER</Button>
             </form>
         );
