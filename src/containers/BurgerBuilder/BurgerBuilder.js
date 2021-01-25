@@ -1,4 +1,7 @@
 import React, { Component } from 'react';
+// Redux >
+import { connect } from 'react-redux';
+
 import Auxiliary from '../../hoc/Auxiliary';
 import Burger from '../../components/Burger/Burger';
 import BuildControls from '../../components/Burger/BuildControls/BuildControls';
@@ -7,6 +10,7 @@ import OrderSummary from '../../components/Burger/OrderSummary/OrderSummary';
 import Spinner from '../../components/UI/Spinner/Spinner';
 import withErrorHandler from '../../hoc/withErrorHandler/withErrorHandler';
 import axios from '../../axios-oders';
+import * as actionTypes from '../../store/actions'; 
 
 
 const INGREDIENT_PRICES = {
@@ -20,7 +24,6 @@ class BurgerBuilder extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            ingredients: null,
             totalPrice: 4,
             purchasable: false,
             purchasing: false,
@@ -106,7 +109,9 @@ class BurgerBuilder extends Component {
 
     render() {
         const disabledInfo = {
-            ...this.state.ingredients
+            // before Redux '...this.state.ingredients' now replaced with 'this.props.ings'
+            // ...this.state.ingredients
+            ...this.props.ings
         };
         for (let key in disabledInfo) {
             disabledInfo[key] = disabledInfo[key] <= 0
@@ -116,20 +121,20 @@ class BurgerBuilder extends Component {
         totalPrice={this.state.totalPrice}
         purchaseCanceled={this.purchaseCancelHandler}
         purchaseContinued={this.purchaseContinueHandler}
-        ingredients={this.state.ingredients} />;
+        ingredients={this.props.ings} />;
 
         if (this.state.loading) {
             orderSummary = <Spinner />
         }
         let burger = <Spinner />
-        if (this.state.ingredients) {
+        if (this.props.ings) {
             burger = (
                 <Auxiliary>
-                    <Burger ingredients={this.state.ingredients}/>
+                    <Burger ingredients={this.props.ings}/>
                     <BuildControls
                     totalPrice={this.state.totalPrice}
-                    ingredientAdded={this.addIngredientHandler}
-                    ingredientRemoved={this.removeIngredientHandler}
+                    ingredientAdded={this.props.onIngredientAdded}
+                    ingredientRemoved={this.props.onIngredientRemoved}
                     disabled={disabledInfo} 
                     ordered={this.purchaseHandler}
                     purchasable={this.state.purchasable} />
@@ -150,4 +155,25 @@ class BurgerBuilder extends Component {
     }
 }
 
-export default withErrorHandler(BurgerBuilder, axios);
+// Redux > holds a function that recieves the state automatically and would return the js object
+// where we define which prop should hold which slice of the state.
+const mapStateToProps = state => {
+    return {
+        ings: state.ingredients
+    };
+}
+
+// Redux > holds a function that recieves the dipsatch function as an arg. reutrns an object that returns props 
+// function mapping. 
+const mapDispatchToProps = dispatch => {
+    return {
+        // pass functions off to props onIngredientAdded and onIngredientRemoved.. 
+        // pass dispatch whic holds a js object
+        onIngredientAdded: (ingName) => {dispatch({type: actionTypes.ADD_INGREDIENT, ingredientName: ingName})},
+        onIngredientRemoved: (ingName) => {dispatch({type: actionTypes.REMOVE_INGREDIENT, ingredientName: ingName})}
+    }
+}
+
+// Redux > to connect to redux, wrap mapState & mapDispatch with connect then pass the entire withErrorHandler as an 
+// arg to the funciton connect(...) function call returns us
+export default connect(mapStateToProps, mapDispatchToProps) (withErrorHandler(BurgerBuilder, axios));
