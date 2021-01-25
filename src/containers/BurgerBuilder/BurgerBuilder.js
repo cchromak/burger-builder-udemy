@@ -28,7 +28,7 @@ class BurgerBuilder extends Component {
             // removed > Redux
             // ingredients: null,
             // totalPrice: 4,
-            purchasable: false,
+            // purchasable: false,
             purchasing: false,
             loading: false
         };
@@ -49,7 +49,9 @@ class BurgerBuilder extends Component {
             .reduce((sum, el) => {
                 return sum + el;
             }, 0);
-        this.setState({purchasable: sum > 0})
+        // before Redux    
+        // this.setState({purchasable: sum > 0});
+        return sum > 0;
     };
 
     // removed addIngredient/removeIngredient after Redux brought in
@@ -142,7 +144,9 @@ class BurgerBuilder extends Component {
                     ingredientRemoved={this.props.onIngredientRemoved}
                     disabled={disabledInfo} 
                     ordered={this.purchaseHandler}
-                    purchasable={this.state.purchasable} />
+                    // purchasable={this.state.purchasable}
+                    // Redux > raech out to method passing ings, returns boolean value
+                    purchasable={this.updatePurchaseState(this.props.ings)} />
                 </Auxiliary>
             );
         }
